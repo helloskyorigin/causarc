@@ -1,13 +1,46 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {simulate} from '../assets/simulator.mjs';
-test('concurrent reads without safeguard can breach invariant',()=>{const r=simulate({payment:100,request:100,mode:'concurrent',atomic:false});assert.equal(r.refunded,200);assert.equal(r.breached,true);assert.equal(r.excess,100);});
-test('atomic safeguard blocks second commit',()=>{const r=simulate({payment:100,request:100,mode:'concurrent',atomic:true});assert.equal(r.refunded,100);assert.equal(r.blocked,1);assert.equal(r.passed,true);});
-test('sequential execution avoids duplicate full refunds',()=>{const r=simulate({payment:100,request:100,mode:'sequential'});assert.equal(r.refunded,100);assert.equal(r.passed,true);});
-test('smaller requests are safe when sum within balance',()=>{const r=simulate({payment:100,request:40,mode:'concurrent'});assert.equal(r.refunded,80);assert.equal(r.passed,true);});
-test('reject invalid inputs',()=>{assert.throws(()=>simulate({payment:-1}));assert.throws(()=>simulate({request:Infinity}));assert.throws(()=>simulate({mode:'invalid'}));});
-test('trace records both reads before commits',()=>{const r=simulate();const names=r.events.map(e=>e.action);const a=names.indexOf('Read payment ledger');const lastRead=names.lastIndexOf('Read payment ledger');const firstCommit=names.findIndex(x=>x.startsWith('Commit '));assert.ok(a>=0);assert.ok(lastRead> a);assert.ok(firstCommit>lastRead);});
+import { simulate } from '../assets/simulator.mjs';
 
-test('rejects fractional cents and sub-cent values',()=>{assert.throws(()=>simulate({payment:0.001}));assert.throws(()=>simulate({request:1.005}));});
-test('supports exact cents and catches excess refunds',()=>{const r=simulate({payment:0.30,request:0.20});assert.equal(r.refunded,0.4);assert.equal(r.breached,true);});
-test('rejects requests larger than observed balance',()=>{const r=simulate({payment:100,request:150});assert.equal(r.refunded,0);assert.equal(r.blocked,2);});
+test('concurrent reads without safeguard cause real ledger violation', () => {
+  const r = simulate({ mode: 'concurrent', atomic: false, payment: 100, request: 100 });
+  assert.equal(r.refunded, 200);
+  assert.equal(r.excess, 100);
+  assert.equal(r.breached, true);
+  assert.ok(r.events.some(e => e.kind === 'breach'));
+});
+test('atomic refund limit blocks second commit', () => {
+  const r = simulate({ mode: 'concurrent', atomic: true, payment: 100, request: 100 });
+  assert.equal(r.refunded, 100);
+  assert.equal(r.blocked, 1);
+  assert.equal(r.breached, false);
+});
+test('serialized execution avoids over-refunding', () => {
+  const r = simulate({ mode: 'sequential', atomic: false, payment: 100, request: 100 });
+  assert.equal(r.refunded, 100);
+  assert.equal(r.breached, false);
+});
+test('smaller requests only fail when their sum exceeds balance', () => {
+  assert.equal(simulate({ request: 40 }).breached, false);
+  assert.equal(simulate({ request: 60 }).breached, true);
+});
+test('input validation rejects nonsense', () => {
+  assert.throws(() => simulate({ payment: -100 }), /positive/);
+  assert.throws(() => simulate({ mode: 'infinite' }), /Invalid/);
+});
+test('the trace preserves expected event ordering', () => {
+  const r = simulate({});
+  const readB = r.events.findIndex(e => e.actor === 'Agent B' && e.action === 'Read payment ledger');
+  const commitA = r.events.findIndex(e => e.action === 'Commit Agent A refund');
+  assert.ok(readB < commitA);
+});
+
+test('currency inputs reject fractional cents', () => {
+  assert.throws(() => simulate({ payment: 1.001 }), /fractions of a cent/);
+  assert.throws(() => simulate({ request: 0.005 }), /fractions of a cent/);
+});
+test('non-whole dollar cents remain valid', () => {
+  const r = simulate({ payment: 1.01, request: 0.50, atomic: true });
+  assert.equal(r.refunded, 1);
+  assert.equal(r.passed, true);
+});

@@ -1,8 +1,8 @@
 # Causarc — YC interactive technical prototype
 
-**The failure isn't in one agent. It's in what happens between them.**
+**The agent passed. The system broke.**
 
-Causarc is a proposed simulation and safety-testing platform for interconnected AI-agent workflows. This repository contains a **synthetic interactive prototype**: a premium landing page and a reproducible payment/refund state simulator. It is **not** a production agent-testing platform, and it does not connect to live LLMs, payment providers, or customer infrastructure.
+Causarc is a proposed simulation and safety-testing platform for interconnected AI-agent workflows. This repository contains a **synthetic interactive prototype**: a purpose-built developer interface and a reproducible payment/refund state simulator. It is **not** a production agent-testing platform, and it does not connect to live LLMs, payment providers, or customer infrastructure.
 
 ## Routes
 
@@ -17,7 +17,7 @@ The model in `assets/simulator.mjs` executes state transitions on a synthetic pa
 - concurrent or sequential execution order
 - atomic ledger-level safeguard on/off
 
-The result and trace are derived from the calculation, not a mocked result or a prewritten animation. Replaying the event trace lets you inspect intermediate ledger states. Enabling the safeguard and rerunning verifies its effect in that **specific model**.
+The result and trace are derived from the calculation, not a mocked result or a prewritten animation. Clicking or replaying the event trace lets you inspect intermediate ledger states. The demo also exports a machine-readable JSON execution trace. Enabling the safeguard and rerunning verifies its effect in that **specific model**.
 
 **Limitations:** The agents are scripted actors, not real LLM-driven agents. The prototype explores one deterministic failure mode; it does not discover unknown risks or provide general safety guarantees.
 
@@ -47,6 +47,8 @@ Deploy the repository as a static site (no build command). Keep the directory st
 
 The project is at a prototype stage. No users, revenue, external integrations, production deployments, or discovered real-world vulnerabilities are claimed here.
 
-## Responsive audit — October 2026
+## Interface & testing
 
-The interactive prototype has been browser-tested locally at 320, 360, 375, 390, 428, 550, 768, 820, 1024, 1280, and 1440 pixel widths. Checks covered horizontal overflow, refund simulation, safeguard retests, manual safeguard toggling, invalid inputs, sequential operation and keyboard trace navigation. This is a synthetic proof-of-concept, not a real LLM agent safety engine.
+The landing page uses a technical incident preview rather than generic marketing feature cards. The `/demo/` route combines configuration, a system topology, a ledger inspector, event selection, repeatable tests and JSON trace export. No backend or paid API keys are required.
+
+UI browser smoke checks were performed at 320, 390, 768, 1024 and 1440 CSS pixel widths using inline-loaded production markup and code, including failure → safeguard → retest and replay interactions. A separate deployed-environment check is still required.

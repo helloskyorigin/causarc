@@ -29,10 +29,10 @@ function stopPlayback() {
   playback = null;
   $('replayButton').textContent = 'Replay ↻';
 }
-function clearResults({ preserveBaseline = false } = {}) {
+function clearResults({ preserveComparison = false } = {}) {
   stopPlayback();
   currentRun = null;
-  if (!preserveBaseline) previousUnsafeRun = null;
+  if (!preserveComparison) previousUnsafeRun = null;
   activeEvent = -1;
   setStatus('ready');
   setText('refundedValue', '$0.00');
@@ -53,6 +53,7 @@ function clearResults({ preserveBaseline = false } = {}) {
   $('analysisResult').hidden = true;
   $('stepButton').disabled = true;
   $('replayButton').disabled = true;
+  $('exportButton').disabled = true;
   $('applyFixButton').disabled = true;
   $('nodeA').className = 'graph-agent graph-a';
   $('nodeB').className = 'graph-agent graph-b';
@@ -109,11 +110,12 @@ function selectEvent(index) {
   $('stateBadge').className = 'state-status ' + (event.breached ? 'failed' : invariantEvaluated ? 'passed' : '');
   const selectedItem = $('traceList').querySelector(`[data-index="${activeEvent}"]`);
   if (selectedItem) {
+    // Keep trace scrolling inside its own pane; never jump the entire document.
     const list = $('traceList');
-    const box = list.getBoundingClientRect();
-    const selected = selectedItem.getBoundingClientRect();
-    if (selected.top < box.top) list.scrollTop += selected.top - box.top;
-    else if (selected.bottom > box.bottom) list.scrollTop += selected.bottom - box.bottom;
+    const node = selectedItem.getBoundingClientRect();
+    const region = list.getBoundingClientRect();
+    if (node.top < region.top) list.scrollTop -= (region.top - node.top) + 2;
+    if (node.bottom > region.bottom) list.scrollTop += (node.bottom - region.bottom) + 2;
   }
   $('stepButton').disabled = activeEvent >= currentRun.events.length - 1;
 }
@@ -155,6 +157,7 @@ function runSimulation() {
     setText('eventCounter', `${result.events.length} EVENTS`);
     setText('traceHint', 'Select any event or replay the trace to inspect changing ledger state.');
     $('replayButton').disabled = false;
+    $('exportButton').disabled = false;
     renderAnalysis();
     selectEvent(result.events.length - 1);
   } catch (e) { error.textContent = e.message; error.hidden = false; }
@@ -176,9 +179,22 @@ function replay() {
   }, 450);
 }
 $('runButton').addEventListener('click', runSimulation);
-$('introRunButton').addEventListener('click', () => {
-  runSimulation();
-  if (currentRun) $('workspace').scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+$('exportButton').addEventListener('click', () => {
+  if (!currentRun) return;
+  const report = {
+    kind: 'causarc-synthetic-refund-trace',
+    disclaimer: 'Deterministic synthetic actors; not a production agent test',
+    ...currentRun
+  };
+  const blob = new Blob([JSON.stringify(report, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = 'causarc-refund-race-trace.json';
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
 });
 $('resetButton').addEventListener('click', () => {
   field.payment.value = '100'; field.request.value = '100'; field.atomic.checked = false;
@@ -190,15 +206,14 @@ $('stepButton').addEventListener('click', () => { stopPlayback(); if (currentRun
 $('replayButton').addEventListener('click', () => playback == null ? replay() : stopPlayback());
 $('applyFixButton').addEventListener('click', retest);
 $('analysisRetestButton').addEventListener('click', retest);
-for (const element of [field.payment, field.request, ...document.querySelectorAll('input[name="mode"]')]) {
-  element.addEventListener('change', () => { $('inputError').hidden = true; clearResults(); });
+for (const element of [field.payment, field.request, field.atomic, ...document.querySelectorAll('input[name="mode"]')]) {
+  element.addEventListener('change', () => {
+    $('inputError').hidden = true;
+    // Preserve an unsafe baseline only when the user changes the safeguard,
+    // never across unrelated scenario/input changes.
+    const safeguardOnly = element === field.atomic;
+    if (safeguardOnly && currentRun && !currentRun.input.atomic) previousUnsafeRun = currentRun;
+    clearResults({ preserveComparison: safeguardOnly });
+  });
 }
-field.atomic.addEventListener('change', () => {
-  $('inputError').hidden = true;
-  const baseline = previousUnsafeRun && previousUnsafeRun.input.payment === Number(field.payment.value)
-    && previousUnsafeRun.input.request === Number(field.request.value)
-    && previousUnsafeRun.input.mode === config().mode;
-  clearResults({ preserveBaseline: Boolean(baseline) });
-  setText('traceHint', baseline ? 'Safeguard changed. Rerun the same scenario to compare outcomes.' : 'Run a simulation to inspect the executed sequence.');
-});
 clearResults();
