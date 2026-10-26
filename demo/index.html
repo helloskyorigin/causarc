@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#0a0b0d"/>
+  <meta name="description" content="Run the Causarc synthetic multi-agent refund failure simulator and verify the transaction-level safeguard."/>
+  <title>Simulation Lab — Causarc</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="/assets/styles.css"/>
+  <script type="module" src="/assets/demo.js" defer></script>
+</head>
+<body class="demo-page">
+  <header class="site-header shell-width"><a class="brand" href="/"><span class="brand-symbol" aria-hidden="true"><span></span></span><span>causarc<span class="brand-period">.</span></span></a><span class="demo-top-label"><span class="status-led"></span> SIMULATION LAB <span class="desktop-only">/ 001 — CONCURRENT REFUNDS</span></span><a href="/" class="button button-outline nav-action">← Back to site</a></header>
+  <main class="shell-width demo-main">
+    <div class="demo-intro"><div><div class="section-label">EXECUTABLE WORKFLOW MODEL / SYNTHETIC SCENARIO 001</div><h1>When valid actions<br/><span>produce an invalid outcome.</span></h1><p>Run a real state-transition model of two refund agents. Change the execution order or enforce a ledger-level safeguard. Inspect every step.</p></div><div class="demo-status" id="overallStatus" aria-live="polite"><span class="status-led"></span> READY TO SIMULATE</div></div>
+    <div class="workspace">
+      <aside class="workspace-card controls-panel"><div class="workspace-card-header"><span>01 / CONFIGURATION</span><span class="small-square">⚙</span></div><h2>Refund workflow</h2><p class="panel-subtitle">Choose how two agents execute refunds against one captured payment.</p>
+        <div class="control-group"><label for="paymentInput">Captured payment <span>USD</span></label><div class="amount-input"><span>$</span><input id="paymentInput" type="number" value="100" min="1" max="100000" step="1" inputmode="decimal"/></div></div>
+        <div class="control-group"><label for="refundInput">Each agent requests <span>USD</span></label><div class="amount-input"><span>$</span><input id="refundInput" type="number" value="100" min="1" max="100000" step="1" inputmode="decimal"/></div></div>
+        <fieldset class="control-group"><legend>Execution mode</legend><div class="segmented"><label><input type="radio" name="mode" value="concurrent" checked/><span>Concurrent</span></label><label><input type="radio" name="mode" value="sequential"/><span>Sequential</span></label></div><p class="control-help" id="modeDescription">Both agents read the same ledger state before either commits.</p></fieldset>
+        <div class="switch-row"><div><label for="atomicToggle">Atomic refund limit</label><p>Recheck the authoritative balance at commit.</p></div><label class="switch" aria-label="Enable atomic safeguard"><input id="atomicToggle" type="checkbox"/><span class="switch-track"></span></label></div>
+        <p class="error-message" id="inputError" role="alert" hidden></p>
+        <button id="runButton" class="button button-accent run-button">Run simulation <span>↗</span></button>
+        <button id="resetButton" class="button button-ghost">Reset scenario ↺</button>
+        <div class="disclosure"><span class="dot-light"></span><span>Technical prototype only. These are scripted agent behaviors in an executable synthetic state model—not live LLM agents or production payments.</span></div>
+      </aside>
+      <section class="workspace-card canvas-panel" aria-label="Agent workflow graph"><div class="workspace-card-header"><span>02 / WORKFLOW GRAPH</span><span id="graphMode">CONCURRENT MODE</span></div><div class="graph-area"><div class="grid-overlay"></div><div class="graph-payment"><small>CAPTURED PAYMENT</small><strong id="graphPayment">$100.00</strong></div><svg class="demo-wires" viewBox="0 0 520 420" preserveAspectRatio="none" aria-hidden="true"><path d="M260 62 V116 H129 V168"/><path d="M260 116 H391 V168"/><path d="M129 260 V306 H260 V346"/><path d="M391 260 V306 H260 V346"/></svg><div class="graph-agent graph-a" id="nodeA"><span class="graph-avatar">A</span><div><small>REFUND AGENT</small><strong>Agent A</strong><span>Request <b id="requestA">$100</b></span></div><i></i></div><div class="graph-agent graph-b" id="nodeB"><span class="graph-avatar">B</span><div><small>REFUND AGENT</small><strong>Agent B</strong><span>Request <b id="requestB">$100</b></span></div><i></i></div><div class="graph-ledger" id="nodeLedger"><span>▤</span><div><small>STATEFUL SERVICE</small><strong>Payment ledger</strong></div><i></i></div></div><div class="canvas-legend"><span><i class="legend-lime"></i> Agent activity</span><span><i class="legend-red"></i> Rule violation</span><span><i class="legend-green"></i> Safety check passed</span></div></section>
+      <aside class="workspace-card state-panel"><div class="workspace-card-header"><span>03 / BUSINESS STATE</span><span class="small-square">↗</span></div><div class="state-status" id="stateBadge">AWAITING RUN</div><div class="big-state"><small>TOTAL REFUNDED</small><strong id="refundedValue">$0.00</strong><span id="refundedSub">No events executed yet</span></div><div class="state-row"><span>Captured payment</span><strong id="capturedValue">$100.00</strong></div><div class="state-row"><span>Remaining balance</span><strong id="remainingValue">$100.00</strong></div><div class="state-row"><span>Requests blocked</span><strong id="blockedValue">0</strong></div><div class="invariant-box"><span>BUSINESS INVARIANT</span><code>total_refunds ≤ captured_payment</code><div id="invariantResult">Not evaluated</div></div><button id="applyFixButton" class="button button-safeguard" disabled>Enable safeguard &amp; retest ↗</button></aside>
+    </div>
+    <div class="results-grid">
+      <section class="workspace-card trace-panel"><div class="workspace-card-header"><span>04 / EXECUTION TRACE</span><span id="eventCounter">0 EVENTS</span></div><div class="trace-toolbar"><div><h2>Every action. Every state change.</h2><p id="traceHint">Run a simulation to inspect the executed sequence.</p></div><div class="trace-actions"><button id="stepButton" class="small-action" disabled>Step →</button><button id="replayButton" class="small-action" disabled>Replay ↻</button></div></div><ol id="traceList" class="trace-list"><li class="trace-empty">No simulation has been executed.</li></ol></section>
+      <section class="workspace-card findings-panel"><div class="workspace-card-header"><span>05 / ANALYSIS</span><span>RULE-BASED</span></div><div id="analysisEmpty" class="analysis-empty"><span class="analysis-glyph">◎</span><h2>Awaiting evidence</h2><p>The invariant checker evaluates simulated state—not an AI-generated risk score.</p></div><div id="analysisResult" hidden><div id="analysisVerdict" class="analysis-verdict"></div><h2 id="analysisHeadline"></h2><p id="analysisExplanation"></p><div class="analysis-rule"><small>DETERMINISTIC ASSERTION</small><code id="analysisAssertion"></code></div><div id="comparison" class="comparison-small" hidden></div><button id="analysisRetestButton" class="button button-outline analysis-action">Test atomic safeguard ↗</button></div></section>
+    </div>
+    <div class="demo-footnote"><span>CAUSARC / PROOF OF CONCEPT</span><p>The demo models deterministic agent actions and real synthetic ledger updates. It does not discover unknown failures, connect to financial services, or represent the full planned platform.</p></div>
+  </main>
+  <footer class="footer shell-width"><a href="/" class="brand"><span class="brand-symbol"><span></span></span><span>causarc<span class="brand-period">.</span></span></a><p>Safety engineering for autonomous operations. Technical prototype; synthetic data only.</p><span>© 2026 Causarc</span></footer>
+</body>
+</html>

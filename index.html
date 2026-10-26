@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#0a0b0d"/>
+  <meta name="description" content="Causarc explores cascading business failures in interconnected AI agent workflows. Try an executable synthetic refund safety simulation."/>
+  <meta property="og:title" content="Causarc — Safety for autonomous business"/>
+  <meta property="og:description" content="The failure isn't in one agent. It's in what happens between them."/>
+  <title>Causarc — The Safety Layer for Autonomous Business</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="/assets/styles.css"/>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header shell-width">
+      <a class="brand" href="/" aria-label="Causarc home"><span class="brand-symbol" aria-hidden="true"><span></span></span><span>causarc<span class="brand-period">.</span></span></a>
+      <nav class="desktop-nav" aria-label="Main navigation"><a href="#problem">The problem</a><a href="#approach">How it works</a><a href="#vision">Vision</a></nav>
+      <a class="button button-outline nav-action" href="/demo/">Open simulator <span aria-hidden="true">↗</span></a>
+    </header>
+    <main>
+      <section class="hero shell-width">
+        <div class="hero-topline"><span class="status-led"></span> INTRODUCING CAUSARC <span class="topline-rule"></span> INTERACTIVE TECHNICAL PROTOTYPE</div>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <h1>The failure isn't<br/>in <em>one</em> agent.<br/><span>It's in what<br/>happens between them.</span></h1>
+            <p>When autonomous agents act across connected systems, individually correct decisions can create catastrophic business outcomes. Discover the chain before it's real.</p>
+            <div class="hero-buttons"><a class="button button-accent" href="/demo/">Run the simulation <span aria-hidden="true">↗</span></a><a class="link-arrow" href="#problem">Understand the risk <span aria-hidden="true">↓</span></a></div>
+            <div class="hero-meta"><span><i></i> No signup</span><span><i></i> Synthetic transactions</span><span><i></i> Runnable workflow model</span></div>
+          </div>
+          <div class="hero-visual" aria-label="Illustrative synthetic workflow with two connected agents and a shared ledger">
+            <div class="visual-top"><span>CAUSARC / LAB 001</span><span class="muted">SYNTHETIC WORKFLOW</span></div>
+            <div class="visual-canvas">
+              <div class="grid-overlay"></div>
+              <div class="flow-source">PAYMENT <strong>$100.00</strong></div>
+              <svg class="flow-lines" viewBox="0 0 440 330" preserveAspectRatio="none" aria-hidden="true"><path d="M220 44 V77 H112 V109"/><path d="M220 77 H328 V109"/><path d="M112 177 V215 H220 V242"/><path d="M328 177 V215 H220 V242"/><circle cx="112" cy="109" r="3"/><circle cx="328" cy="109" r="3"/><circle cx="220" cy="242" r="3"/></svg>
+              <div class="visual-agent agent-a"><span class="node-icon">A</span><div><small>REFUND AGENT</small><strong>Agent A</strong><span class="node-detail">Authorizes $100</span></div><span class="node-dot"></span></div>
+              <div class="visual-agent agent-b"><span class="node-icon">B</span><div><small>REFUND AGENT</small><strong>Agent B</strong><span class="node-detail">Authorizes $100</span></div><span class="node-dot"></span></div>
+              <div class="ledger-node"><span class="ledger-icon" aria-hidden="true">▤</span><div><small>SHARED PAYMENT LEDGER</small><strong>Invariant breached</strong></div><span class="ledger-alert">!</span></div>
+            </div>
+            <div class="visual-bottom"><span><span class="tiny-indicator"></span> INVARIANT: TOTAL REFUNDS ≤ CAPTURED PAYMENT</span><span class="critical-text">$200 &gt; $100</span></div>
+          </div>
+        </div>
+        <div class="hero-bottom-label">01 <span>THE BLIND SPOT IN AUTONOMOUS SYSTEMS</span><span class="hero-bottom-line"></span><span>SCROLL TO EXPLORE ↓</span></div>
+      </section>
+      <section class="section section-problem" id="problem">
+        <div class="shell-width"><div class="section-label">01 / THE PROBLEM</div>
+          <div class="problem-grid"><h2>Every agent<br/>can pass.<br/><span>The system<br/>can still fail.</span></h2><div class="problem-body"><p>Individual agent evaluations answer whether a task was completed. They don't necessarily answer whether the entire business stayed safe.</p><p>Retries, stale state, and concurrent decisions can turn a sequence of apparently valid actions into an invalid outcome.</p><div class="problem-rule"><span class="rule-dot"></span> An approved action isn't always a safe outcome.</div></div></div>
+          <div class="comparison">
+            <div class="compare-panel"><div class="compare-header"><span>INDIVIDUAL CHECKS</span><span class="state-pill neutral">ALL PASS</span></div><div class="checks"><div><span class="checkmark">✓</span> Agent A authorized</div><div><span class="checkmark">✓</span> Agent B authorized</div><div><span class="checkmark">✓</span> Both requests valid in isolation</div></div></div>
+            <div class="compare-arrow">≠</div>
+            <div class="compare-panel compare-danger"><div class="compare-header"><span>BUSINESS OUTCOME</span><span class="state-pill bad">VIOLATION</span></div><div class="large-money">$200 <span>/ $100</span></div><p>Two refunds executed against one payment.</p></div>
+          </div>
+        </div>
+      </section>
+      <section class="section section-approach shell-width" id="approach">
+        <div class="section-label">02 / THE METHOD</div><div class="section-heading-row"><h2>Test the whole<br/><span>chain of consequence.</span></h2><p>Causarc's proposed platform focuses on business outcomes across interacting agents—not just on evaluating each agent separately.</p></div>
+        <div class="approach-grid">
+          <article class="method"><span class="method-count">01 — SIMULATE</span><div class="method-glyph glyph-concurrency" aria-hidden="true"><span>A</span><span>B</span><b>▤</b></div><h3>Reproduce the conditions.</h3><p>Execute synthetic workflows with realistic concurrent actions, retries, and delayed state changes.</p></article>
+          <article class="method"><span class="method-count">02 — TRACE</span><div class="method-glyph glyph-trace" aria-hidden="true"><i></i><i></i><i></i><i></i></div><h3>Expose the exact sequence.</h3><p>Track state changes and find where a critical business invariant becomes false.</p></article>
+          <article class="method"><span class="method-count">03 — VERIFY</span><div class="method-glyph glyph-verify" aria-hidden="true"><span>✓</span></div><h3>Test what prevents it.</h3><p>Apply a guard at the transaction boundary, replay the scenario, and measure the new outcome.</p></article>
+        </div>
+      </section>
+      <section class="section demo-preview-section" id="demo">
+        <div class="shell-width demo-preview-grid"><div><div class="section-label">03 / TRY THE PROTOTYPE</div><h2>Don't take our<br/>word for it.<br/><span>Break the workflow.</span></h2><p>Two agents. One payment. A hidden race condition. Run a deterministic synthetic simulation and see exactly how an invalid financial outcome emerges.</p><a class="button button-accent" href="/demo/">Explore interactive simulation <span aria-hidden="true">↗</span></a><div class="preview-caveat">Executable scenario • No real money or AI-agent integrations</div></div>
+          <div class="terminal-preview"><div class="terminal-head"><span class="terminal-symbol">⌘</span> workflow/refund-concurrency <span>TRACE PREVIEW</span></div><div class="terminal-code"><p><span>01</span> <b>Agent A</b> reads refundable balance <strong>$100</strong></p><p><span>02</span> <b>Agent B</b> reads refundable balance <strong>$100</strong></p><p><span>03</span> <b>Agent A</b> commits <strong>$100</strong> refund</p><p><span>04</span> <b>Agent B</b> commits <strong>$100</strong> refund</p><p class="fail-line"><span>05</span> <b>Invariant</b> TOTAL_REFUNDS ≤ CAPTURED_PAYMENT <strong>✕</strong></p></div><div class="terminal-footer"><span>ROOT CAUSE / NON-ATOMIC CHECK</span><span class="terminal-red">UNSAFE</span></div></div>
+        </div>
+      </section>
+      <section class="section vision shell-width" id="vision"><div class="section-label">04 / WHERE THIS GOES</div><div class="vision-grid"><h2>More agents.<br/><em>More autonomy.</em><br/>Higher stakes.</h2><div><p>As companies delegate consequential operations to networks of AI agents, they will need to validate the behavior of the system as a whole.</p><p>We want Causarc to become the safety engineering layer for autonomous business operations—starting with reproducible failure simulation.</p><a class="link-arrow" href="/demo/">See the first step <span aria-hidden="true">↗</span></a></div></div></section>
+      <section class="final-cta shell-width"><div class="final-cta-inner"><span class="section-label">CAUSARC / TECHNICAL PROTOTYPE</span><h2>See what happens<br/>between the agents.</h2><a class="button button-accent" href="/demo/">Run the simulation <span aria-hidden="true">↗</span></a></div></section>
+    </main>
+    <footer class="footer shell-width"><a class="brand" href="/" aria-label="Causarc home"><span class="brand-symbol" aria-hidden="true"><span></span></span><span>causarc<span class="brand-period">.</span></span></a><p>Early technical prototype. All workflows and transactions shown are synthetic. No production integrations or customer outcomes are implied.</p><span>© 2026 Causarc</span></footer>
+  </div>
+</body>
+</html>
