@@ -29,10 +29,10 @@ function stopPlayback() {
   playback = null;
   $('replayButton').textContent = 'Replay ↻';
 }
-function clearResults() {
+function clearResults({ preserveBaseline = false } = {}) {
   stopPlayback();
   currentRun = null;
-  previousUnsafeRun = null;
+  if (!preserveBaseline) previousUnsafeRun = null;
   activeEvent = -1;
   setStatus('ready');
   setText('refundedValue', '$0.00');
@@ -108,7 +108,13 @@ function selectEvent(index) {
   setText('stateBadge', event.breached ? 'FAILURE OBSERVED' : (invariantEvaluated ? 'TEST PASSED' : 'SIMULATED EXECUTION'));
   $('stateBadge').className = 'state-status ' + (event.breached ? 'failed' : invariantEvaluated ? 'passed' : '');
   const selectedItem = $('traceList').querySelector(`[data-index="${activeEvent}"]`);
-  if (selectedItem) selectedItem.scrollIntoView({ block:'nearest', behavior:'smooth' });
+  if (selectedItem) {
+    const list = $('traceList');
+    const box = list.getBoundingClientRect();
+    const selected = selectedItem.getBoundingClientRect();
+    if (selected.top < box.top) list.scrollTop += selected.top - box.top;
+    else if (selected.bottom > box.bottom) list.scrollTop += selected.bottom - box.bottom;
+  }
   $('stepButton').disabled = activeEvent >= currentRun.events.length - 1;
 }
 function renderAnalysis() {
@@ -170,6 +176,10 @@ function replay() {
   }, 450);
 }
 $('runButton').addEventListener('click', runSimulation);
+$('introRunButton').addEventListener('click', () => {
+  runSimulation();
+  if (currentRun) $('workspace').scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+});
 $('resetButton').addEventListener('click', () => {
   field.payment.value = '100'; field.request.value = '100'; field.atomic.checked = false;
   document.querySelector('input[name="mode"][value="concurrent"]').checked = true;
@@ -180,7 +190,15 @@ $('stepButton').addEventListener('click', () => { stopPlayback(); if (currentRun
 $('replayButton').addEventListener('click', () => playback == null ? replay() : stopPlayback());
 $('applyFixButton').addEventListener('click', retest);
 $('analysisRetestButton').addEventListener('click', retest);
-for (const element of [field.payment, field.request, field.atomic, ...document.querySelectorAll('input[name="mode"]')]) {
+for (const element of [field.payment, field.request, ...document.querySelectorAll('input[name="mode"]')]) {
   element.addEventListener('change', () => { $('inputError').hidden = true; clearResults(); });
 }
+field.atomic.addEventListener('change', () => {
+  $('inputError').hidden = true;
+  const baseline = previousUnsafeRun && previousUnsafeRun.input.payment === Number(field.payment.value)
+    && previousUnsafeRun.input.request === Number(field.request.value)
+    && previousUnsafeRun.input.mode === config().mode;
+  clearResults({ preserveBaseline: Boolean(baseline) });
+  setText('traceHint', baseline ? 'Safeguard changed. Rerun the same scenario to compare outcomes.' : 'Run a simulation to inspect the executed sequence.');
+});
 clearResults();

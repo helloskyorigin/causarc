@@ -46,3 +46,7 @@ Deploy the repository as a static site (no build command). Keep the directory st
 ## YC disclosure
 
 The project is at a prototype stage. No users, revenue, external integrations, production deployments, or discovered real-world vulnerabilities are claimed here.
+
+## Responsive audit — October 2026
+
+The interactive prototype has been browser-tested locally at 320, 360, 375, 390, 428, 550, 768, 820, 1024, 1280, and 1440 pixel widths. Checks covered horizontal overflow, refund simulation, safeguard retests, manual safeguard toggling, invalid inputs, sequential operation and keyboard trace navigation. This is a synthetic proof-of-concept, not a real LLM agent safety engine.

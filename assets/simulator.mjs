@@ -4,6 +4,7 @@ export function simulate({ mode = 'concurrent', atomic = false, payment = 100, r
  if(!Number.isFinite(payment)||!Number.isFinite(request)||payment<=0||request<=0||payment>100000||request>100000)throw new Error('Payment and refund amounts must be positive numbers under $100,000.');
  if(!['concurrent','sequential'].includes(mode))throw new Error('Invalid execution mode.');
  const cents=n=>Math.round((n+Number.EPSILON)*100), captured=cents(payment), amount=cents(request);
+ if(captured<1||amount<1||Math.abs(captured/100-payment)>1e-9||Math.abs(amount/100-request)>1e-9)throw new Error('Amounts must be at least $0.01 and use no more than two decimal places.');
  const dollars=n=>'$'+(n/100).toFixed(2);let refunded=0,blocked=0;const events=[];
  function trace(actor,action,description,kind='neutral'){events.push({id:events.length+1,actor,action,description,kind,state:{captured:captured/100,refunded:refunded/100,remaining:(captured-refunded)/100},breached:refunded>captured});}
  trace('System','Initialize synthetic payment','Captured payment: '+dollars(captured)+'. Two agents may issue refunds against this shared state.');

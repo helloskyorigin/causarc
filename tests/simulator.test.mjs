@@ -7,3 +7,7 @@ test('sequential execution avoids duplicate full refunds',()=>{const r=simulate(
 test('smaller requests are safe when sum within balance',()=>{const r=simulate({payment:100,request:40,mode:'concurrent'});assert.equal(r.refunded,80);assert.equal(r.passed,true);});
 test('reject invalid inputs',()=>{assert.throws(()=>simulate({payment:-1}));assert.throws(()=>simulate({request:Infinity}));assert.throws(()=>simulate({mode:'invalid'}));});
 test('trace records both reads before commits',()=>{const r=simulate();const names=r.events.map(e=>e.action);const a=names.indexOf('Read payment ledger');const lastRead=names.lastIndexOf('Read payment ledger');const firstCommit=names.findIndex(x=>x.startsWith('Commit '));assert.ok(a>=0);assert.ok(lastRead> a);assert.ok(firstCommit>lastRead);});
+
+test('rejects fractional cents and sub-cent values',()=>{assert.throws(()=>simulate({payment:0.001}));assert.throws(()=>simulate({request:1.005}));});
+test('supports exact cents and catches excess refunds',()=>{const r=simulate({payment:0.30,request:0.20});assert.equal(r.refunded,0.4);assert.equal(r.breached,true);});
+test('rejects requests larger than observed balance',()=>{const r=simulate({payment:100,request:150});assert.equal(r.refunded,0);assert.equal(r.blocked,2);});
